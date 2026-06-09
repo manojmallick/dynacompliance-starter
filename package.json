@@ -1,0 +1,24 @@
+{
+  "name": "dynacompliance-starter",
+  "version": "1.0.0",
+  "description": "DynaCompliance — DORA Art.18 classification + Art.19 reporting agent. Gemini 3 + Google Cloud Agent Builder + Dynatrace MCP.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env --watch src/server.js",
+    "start": "node --env-file-if-exists=.env src/server.js",
+    "demo": "MOCK=true PORT=8090 node src/server.js",
+    "test": "node --test",
+    "inspect:dt": "node scripts/inspect-dynatrace.js"
+  },
+  "dependencies": {
+    "@dynatrace-oss/dynatrace-mcp-server": "^1.8.7",
+    "@google/genai": "^0.3.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@neondatabase/serverless": "^0.10.4",
+    "express": "^4.19.2"
+  }
+}

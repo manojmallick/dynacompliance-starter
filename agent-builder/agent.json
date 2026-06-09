@@ -1,0 +1,26 @@
+{
+  "_comment": "Google Cloud Agent Builder definition for the JUDGED DynaCompliance agent: Gemini 3 + the real Dynatrace MCP server (@dynatrace-oss/dynatrace-mcp-server). Import via the Agent Builder console or gcloud (see README). The Express app in src/ mirrors this for the hosted demo UI, and src/dynatrace-mcp.js invokes this same MCP server at runtime when DT_USE_MCP=true.",
+  "displayName": "DynaCompliance",
+  "model": "gemini-3",
+  "description": "DORA incident classifier & reporter: collects ICT incident data from Dynatrace, applies Article 18 major/minor classification criteria, drafts the Article 19 early-warning notification, and proposes writing the classification back + submitting to the regulator, gated on human approval.",
+  "instruction": "You are DynaCompliance. For a Dynatrace problem: (1) use the dynatrace MCP tools (list_problems, and execute_dql / chat_with_davis_copilot for root-cause and metric context) to collect problem details, affected entities, metrics, and Davis AI root cause; (2) apply DORA Article 18 major-incident classification thresholds (>10% clients for >2h, >€5M transaction value, any data breach, core banking down >2h, payments down >30min) — if borderline, classify MAJOR; (3) if the root cause is a third party, also flag DORA Article 28; (4) compute Article 19 reporting deadlines from the DETECTION time / Davis AI awareness timestamp (4h early warning, 72h intermediate, 1 month final) and draft the EBA notification; (5) do NOT write back to Dynatrace (e.g. via an execute_dql ingest / workflow) or submit any regulatory notification until the human approves — present the draft and the deadline and wait.",
+  "tools": [
+    {
+      "type": "mcp",
+      "mcpServer": {
+        "command": "npx",
+        "args": ["-y", "@dynatrace-oss/dynatrace-mcp-server"],
+        "env": {
+          "DT_ENVIRONMENT": "${DT_ENVIRONMENT}",
+          "DT_PLATFORM_TOKEN": "${DT_PLATFORM_TOKEN}"
+        }
+      },
+      "_exposedTools_comment": "Names are discovered from the server at runtime (it is DQL-first). Common tools: list_problems, list_vulnerabilities, list_exceptions, execute_dql, chat_with_davis_copilot, list_davis_analyzers, execute_davis_analyzer, send_slack_message. Verify against `listTools` for your installed version.",
+      "exposedTools": ["list_problems", "execute_dql", "chat_with_davis_copilot", "list_davis_analyzers", "execute_davis_analyzer"]
+    }
+  ],
+  "humanInTheLoop": {
+    "requireApprovalFor": ["execute_dql", "send_slack_message"],
+    "_comment": "Consequential writes (ingest/workflow via execute_dql) + any regulator/Slack notification pause for human approval — maps to the UI ApprovalBar and the 'keep you in control' rule."
+  }
+}

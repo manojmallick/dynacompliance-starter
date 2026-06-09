@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8" />
+<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+<title>DynaCompliance — Operations Center</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%234cd6fb' d='M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z'/%3E%3Cpath fill='%23003642' d='m10.6 14.3-2-2-1.2 1.2 3.2 3.2 6-6-1.2-1.2z'/%3E%3C/svg%3E" />
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "surface-container-high": "#262a37",
+          "on-primary": "#003642",
+          "surface-container-low": "#171b28",
+          "secondary-fixed-dim": "#b7c6eb",
+          "outline": "#869398",
+          "on-tertiary-container": "#5d2f00",
+          "on-secondary-container": "#a9b8dc",
+          "surface-bright": "#353946",
+          "surface-container-lowest": "#0a0e1a",
+          "tertiary-container": "#eb8f3b",
+          "on-error": "#690005",
+          "on-secondary-fixed": "#0a1b37",
+          "on-surface-variant": "#bcc9ce",
+          "on-primary-container": "#00414f",
+          "on-primary-fixed-variant": "#004e5f",
+          "primary-fixed-dim": "#4cd6fb",
+          "on-surface": "#dfe2f3",
+          "secondary-fixed": "#d8e2ff",
+          "surface-dim": "#0f131f",
+          "background": "#0f131f",
+          "on-error-container": "#ffdad6",
+          "surface-variant": "#313442",
+          "on-secondary": "#21304d",
+          "surface": "#0f131f",
+          "error": "#ffb4ab",
+          "primary-fixed": "#b3ebff",
+          "surface-tint": "#4cd6fb",
+          "error-container": "#93000a",
+          "inverse-primary": "#00677d",
+          "on-primary-fixed": "#001f27",
+          "surface-container": "#1b1f2c",
+          "outline-variant": "#3d494d",
+          "inverse-surface": "#dfe2f3",
+          "tertiary-fixed-dim": "#ffb77d",
+          "surface-container-highest": "#313442",
+          "tertiary": "#ffb77d",
+          "on-secondary-fixed-variant": "#384765",
+          "secondary": "#b7c6eb",
+          "primary-container": "#00b4d8",
+          "on-tertiary": "#4d2600",
+          "tertiary-fixed": "#ffdcc3",
+          "on-tertiary-fixed": "#2f1500",
+          "secondary-container": "#3a4967",
+          "primary": "#4cd6fb",
+          "on-background": "#dfe2f3",
+          "on-tertiary-fixed-variant": "#6e3900",
+          "inverse-on-surface": "#2c303d",
+          "danger": "#ff4d6d",
+          "success": "#10b981",
+        },
+        borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+        spacing: { "margin-desktop": "32px", gutter: "16px", xl: "32px", md: "16px", lg: "24px", sm: "8px", base: "4px", "margin-mobile": "16px", xs: "4px" },
+        fontFamily: { sans: ["Inter", "sans-serif"] },
+        fontSize: {
+          "title-lg": ["18px", { lineHeight: "24px", fontWeight: "600" }],
+          "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
+          "data-mono": ["14px", { lineHeight: "20px", letterSpacing: "-0.01em", fontWeight: "500" }],
+          "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+          "headline-md": ["24px", { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "600" }],
+          "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+          "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+          "label-sm": ["11px", { lineHeight: "14px", letterSpacing: "0.05em", fontWeight: "500" }],
+          "display-lg": ["36px", { lineHeight: "44px", letterSpacing: "-0.02em", fontWeight: "700" }],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  body { font-family: "Inter", sans-serif; background-color: #0a0e1a; color: #dfe2f3; }
+  .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; vertical-align: middle; }
+  .glass-panel, .bento-card { background: #131929; border: 1px solid #1e2d4a; transition: border-color 0.2s ease; }
+  .glass-panel:hover, .bento-card:hover { border-color: rgba(0, 180, 216, 0.5); }
+  .pulse-danger { animation: pulseRing 2s infinite; }
+  @keyframes pulseRing {
+    0% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.4); }
+    70% { box-shadow: 0 0 0 8px rgba(255, 77, 109, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0); }
+  }
+  .pulse-live { animation: pulseLive 2s infinite; }
+  @keyframes pulseLive {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+    70% { box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #0a0e1a; }
+  ::-webkit-scrollbar-thumb { background: #353946; border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: #4a4f5d; }
+  .nav-active { color: #4cd6fb; }
+  [data-tabnum] { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<!-- ================= TOP NAV ================= -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-desktop bg-surface-dim h-14 border-b border-outline-variant">
+  <div class="flex items-center gap-8">
+    <a href="#/dashboard" class="font-bold text-headline-md text-primary flex items-center gap-2">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">security</span>
+      DynaCompliance
+    </a>
+    <div class="hidden md:flex items-center gap-2 bg-surface-container px-3 py-1 rounded-full border border-outline-variant">
+      <span class="w-2 h-2 rounded-full bg-success pulse-live"></span>
+      <span class="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Monitoring Active</span>
+    </div>
+    <span id="mode-badge" class="hidden text-[10px] font-bold px-2.5 py-1 rounded-full border border-tertiary/50 text-tertiary bg-tertiary/10" title="Running on canned demo data — no live credentials">DEMO DATA</span>
+  </div>
+  <div class="flex items-center gap-6">
+    <div id="dt-status" class="hidden md:flex items-center gap-2 text-on-surface-variant text-body-sm">
+      <span class="material-symbols-outlined text-[18px]">bolt</span>
+      <span>Dynatrace Connected</span>
+    </div>
+    <span class="hidden md:inline text-[11px] font-bold px-2.5 py-1 rounded-full border border-primary/40 text-primary">Gemini 3</span>
+    <div class="h-6 w-px bg-outline-variant hidden md:block"></div>
+    <button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">settings</button>
+    <button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors relative">notifications
+      <span class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-danger rounded-full"></span>
+    </button>
+    <div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold text-xs">JD</div>
+  </div>
+</header>
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="fixed left-0 top-14 h-[calc(100vh-56px)] w-64 flex-col py-lg bg-surface-container-low border-r border-outline-variant hidden md:flex z-40">
+  <div class="px-md mb-xl">
+    <h2 class="text-title-lg font-bold text-on-surface">Operations Center</h2>
+    <div class="flex items-center gap-xs mt-xs text-danger text-label-sm">
+      <span class="h-2 w-2 rounded-full bg-danger pulse-danger"></span>
+      Vigilance Level: High
+    </div>
+  </div>
+  <nav id="sidenav" class="flex-1 px-sm space-y-1">
+    <a data-route="#/dashboard" class="nav-item flex items-center gap-3 px-md py-sm rounded-lg transition-all" href="#/dashboard">
+      <span class="material-symbols-outlined">dashboard</span><span class="text-label-md">Dashboard</span>
+    </a>
+    <a data-route="#/monitor" class="nav-item flex items-center gap-3 px-md py-sm rounded-lg transition-all" href="#/monitor">
+      <span class="material-symbols-outlined">security</span><span class="text-label-md">Compliance Monitor</span>
+    </a>
+    <a data-route="#/eba" class="nav-item flex items-center gap-3 px-md py-sm rounded-lg transition-all" href="#/eba">
+      <span class="material-symbols-outlined">history_edu</span><span class="text-label-md">EBA Notifications</span>
+    </a>
+    <a data-route="#/logs" class="nav-item flex items-center gap-3 px-md py-sm rounded-lg transition-all" href="#/logs">
+      <span class="material-symbols-outlined">list_alt</span><span class="text-label-md">Incident Logs</span>
+    </a>
+    <a data-route="#/report" class="nav-item flex items-center gap-3 px-md py-sm rounded-lg transition-all" href="#/report">
+      <span class="material-symbols-outlined">analytics</span><span class="text-label-md">Monthly Report</span>
+    </a>
+    <a data-route="#/health" class="nav-item flex items-center gap-3 px-md py-sm rounded-lg transition-all" href="#/health">
+      <span class="material-symbols-outlined">monitor_heart</span><span class="text-label-md">System Health</span>
+    </a>
+  </nav>
+  <div class="px-md pt-lg border-t border-outline-variant mt-auto">
+    <button onclick="location.hash='#/dashboard'" class="w-full bg-primary text-on-primary py-sm rounded-lg text-label-md font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+      <span class="material-symbols-outlined text-[18px]">add</span> New Audit
+    </button>
+    <div class="mt-lg space-y-1">
+      <a class="flex items-center gap-3 px-md py-sm text-on-surface-variant text-label-md hover:text-on-surface" href="#/dashboard">
+        <span class="material-symbols-outlined text-[18px]">help</span> Support
+      </a>
+      <a class="flex items-center gap-3 px-md py-sm text-on-surface-variant text-label-md hover:text-on-surface" href="#/dashboard">
+        <span class="material-symbols-outlined text-[18px]">description</span> Documentation
+      </a>
+    </div>
+  </div>
+</aside>
+
+<!-- ================= VIEW MOUNT ================= -->
+<main id="view" class="md:ml-64 pt-14 min-h-screen"></main>
+
+<!-- ================= APPROVAL BAR ================= -->
+<div id="approval" class="fixed left-0 md:left-64 right-0 bottom-0 z-50 hidden items-center gap-md px-margin-desktop py-md bg-surface-container-high border-t border-primary/40">
+  <span class="material-symbols-outlined text-primary text-[28px]">verified_user</span>
+  <div class="flex-1 min-w-0">
+    <div class="text-on-surface font-bold text-body-md truncate" id="ap-title"></div>
+    <div class="text-on-surface-variant text-label-sm truncate" id="ap-tools"></div>
+  </div>
+  <button onclick="DC.rejectApproval()" class="px-lg py-sm rounded-lg border border-outline-variant text-on-surface-variant text-label-md hover:bg-surface-variant">Reject</button>
+  <button onclick="DC.approve()" class="px-lg py-sm rounded-lg bg-primary text-on-primary font-bold text-label-md hover:opacity-90 flex items-center gap-2">
+    Approve &amp; Submit <span class="material-symbols-outlined text-[18px]">send</span>
+  </button>
+</div>
+
+<!-- ================= HEALTH TOAST ================= -->
+<div id="toast" class="fixed bottom-6 right-6 z-[60] hidden max-w-sm bg-surface-container-high border border-outline-variant rounded-xl p-md shadow-2xl"></div>
+
+<script src="/app.js"></script>
+</body>
+</html>
