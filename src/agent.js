@@ -34,6 +34,18 @@ the national competent authority (e.g. DNB) with: entity, incident start, impact
 beyond those provided. Return STRICT JSON:
 { "rationale": string, "eba_draft": string, "confidence": number }`;
 
+// Real Gemini call shared by the live path AND the GEMINI_LIVE demo hybrid, so the
+// hosted URL genuinely invokes Gemini at runtime even when incident data is mock.
+async function geminiDraft(incident, verdict, dl) {
+  const res = await ai.models.generateContent({
+    model: MODEL,
+    config: { systemInstruction: DRAFT_SYSTEM, responseMimeType: "application/json" },
+    contents: `INCIDENT:\n${JSON.stringify(incident, null, 2)}\n\nDETERMINISTIC CLASSIFICATION:\n${JSON.stringify(verdict, null, 2)}\n\nDEADLINES:\n${JSON.stringify(dl, null, 2)}`,
+  });
+  try { return JSON.parse(res.text); }
+  catch { return { rationale: res.text, eba_draft: "", confidence: 0.5 }; }
+}
+
 /** Steps 1-4: classify an incident + draft. Read-only. */
 export async function analyze(problemId) {
   if (process.env.MOCK === "true") return mockAnalyze(problemId);
@@ -49,16 +61,8 @@ export async function analyze(problemId) {
 
   const dl = deadlines(incident.detected_at || incident.start);
 
-  const res = await ai.models.generateContent({
-    model: MODEL,
-    config: { systemInstruction: DRAFT_SYSTEM, responseMimeType: "application/json" },
-    contents: `INCIDENT:\n${JSON.stringify(incident, null, 2)}\n\nDETERMINISTIC CLASSIFICATION:\n${JSON.stringify(verdict, null, 2)}\n\nDEADLINES:\n${JSON.stringify(dl, null, 2)}`,
-  });
-  steps.push({ agent: "DORAClassifier", action: "Gemini 3 drafted rationale + EBA notice", ms: Date.now() - t0 });
-
-  let drafted;
-  try { drafted = JSON.parse(res.text); }
-  catch { drafted = { rationale: res.text, eba_draft: "", confidence: 0.5 }; }
+  const drafted = await geminiDraft(incident, verdict, dl);
+  steps.push({ agent: "DORAClassifier", action: `${MODEL} drafted rationale + EBA notice`, ms: Date.now() - t0 });
 
   const proposedAction = {
     type: "submit_and_writeback",
@@ -78,7 +82,7 @@ export async function analyze(problemId) {
 // --- MOCK MODE: canned demo data so the full UI + ApprovalBar flow runs without creds.
 //     Runs the REAL deterministic classifier over the shared demo dataset so each
 //     incident classifies coherently; only the LLM prose is canned.
-function mockAnalyze(problemId = "INC-2026-047") {
+async function mockAnalyze(problemId = "INC-2026-047") {
   const incident = getMockIncident(problemId);
   const verdict = classify(incident);
   const dl = deadlines(incident.detected_at || incident.start);
@@ -105,15 +109,36 @@ function mockAnalyze(problemId = "INC-2026-047") {
     ],
   };
 
+  // GEMINI_LIVE=true → genuinely call Gemini for the rationale + EBA draft (mock incident
+  // data, real LLM). Lets the credential-free hosted demo still invoke Gemini at runtime.
+  // Falls back to the canned text above on any error so the demo never breaks.
+  let live = null;
+  if (process.env.GEMINI_LIVE === "true") {
+    const t0 = Date.now();
+    try {
+      const d = await geminiDraft(incident, verdict, dl);
+      live = { rationale: d.rationale || rationale, eba_draft: d.eba_draft || eba_draft, confidence: d.confidence ?? (major ? 0.94 : 0.82), ms: Date.now() - t0 };
+    } catch (e) {
+      console.error("[GEMINI_LIVE] fell back to canned:", String(e.message || e).slice(0, 120));
+    }
+  }
+
+  const draftStep = live
+    ? { agent: "DORAClassifier", action: `${MODEL} drafted rationale + EBA notice (live)`, ms: 340 + (live.ms || 0) }
+    : { agent: "DORAClassifier", action: `${MODEL} drafted rationale + EBA notice (mock)`, ms: 1200 };
+
   return {
-    incident, verdict, deadlines: dl, rationale, eba_draft,
-    confidence: major ? 0.94 : 0.82,
+    incident, verdict, deadlines: dl,
+    rationale: live?.rationale ?? rationale,
+    eba_draft: live?.eba_draft ?? eba_draft,
+    confidence: live?.confidence ?? (major ? 0.94 : 0.82),
+    gemini_live: !!live,
     steps: [
       { agent: "DynaWatcher", action: `collected problem ${problemId} (mock)`, ms: 340 },
       { agent: "DORAClassifier", action: `classified ${verdict.classification} (${verdict.triggered.length} criteria) (mock)`, ms: 360 },
-      { agent: "DORAClassifier", action: "Gemini 3 drafted rationale + EBA notice (mock)", ms: 1200 },
+      draftStep,
     ],
-    elapsed_ms: 1200,
+    elapsed_ms: draftStep.ms,
     proposedAction,
   };
 }

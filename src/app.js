@@ -30,6 +30,8 @@ app.get("/health", async (_req, res) => {
     mode: process.env.MOCK === "true" ? "demo" : "live",
     model: process.env.GEMINI_MODEL || "gemini-3",
     gemini_configured: !!(process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_USE_VERTEXAI === "true"),
+    gemini_live: process.env.GEMINI_LIVE === "true", // classify action calls Gemini for real even in demo-data mode
+
     partner: "dynatrace",
     // Read path: DT_USE_MCP=true → real @dynatrace-oss/dynatrace-mcp-server (MCP, called
     // at runtime); else Dynatrace REST API v2. Report exactly which, plus a live MCP
