@@ -31,12 +31,18 @@ Browser (public/index.html) ──POST /api/classify──► agent (src/agent.j
                                                       5. PROPOSE submit ─┐ (gated)
 ApprovalBar (human approves) ──POST /api/execute──►  push_event + submit EBA notification
 ```
-The **judged** agent is [`agent-builder/agent.json`](agent-builder/agent.json)
-(Gemini 3 + the real `@dynatrace-oss/dynatrace-mcp-server`, writes require approval). The
-Express app mirrors it — and with `DT_USE_MCP=true` it invokes that **same MCP server at
-runtime** ([`src/dynatrace-mcp.js`](src/dynatrace-mcp.js): spawn → MCP handshake →
-`listTools` → `callTool`), so the partner MCP server is genuinely called, not just named.
-Confirm at `/health` → `partner_read_path:"mcp"` with a live tool count.
+**All three required technologies in one genuine agent loop** — `POST /api/classify-agent`
+([`src/adk-agent.js`](src/adk-agent.js)) runs the agent on **Google Cloud Agent Builder's
+ADK** (`@google/adk`: `LlmAgent` + `Runner`), reasoning with **Gemini 3**, over the live
+**Dynatrace MCP** server (`@dynatrace-oss/dynatrace-mcp-server`) exposed as an `MCPToolset`.
+The response includes `mcp_tools_called` — proof the partner MCP server actually executed.
+This is the judged path; [`agent-builder/agent.json`](agent-builder/agent.json) is the same
+agent in Agent Builder's declarative form.
+
+The fast Express UI path mirrors it deterministically, and with `DT_USE_MCP=true` it too
+invokes the real MCP server at runtime ([`src/dynatrace-mcp.js`](src/dynatrace-mcp.js):
+spawn → handshake → `listTools` → `callTool`). Confirm wiring at `/health` →
+`agent_builder`, `partner_read_path`, and a live MCP status probe.
 
 ## Two agents
 - **DynaWatcher** — collects problem details, affected entities, metrics, Davis AI root cause.
@@ -68,8 +74,10 @@ The front-end is a single live SPA implementing the three Google Stitch screens:
   incident-progression trend, Major Incidents Log, Article Coverage, Audit Trail.
 
 **API surface:** `GET /health` · `GET /api/incidents` · `GET /api/problems` ·
-`POST /api/classify` · `POST /api/execute` (approval-gated, requires approver, writes
-signed audit) · `GET /api/audit` · `GET /api/report` · `POST /api/handoff`.
+`POST /api/classify` (fast deterministic path) · **`POST /api/classify-agent`** (the real
+ADK agent: Gemini 3 + Dynatrace MCP, returns `mcp_tools_called`) · `POST /api/execute`
+(approval-gated, requires approver, writes signed audit) · `GET /api/audit` ·
+`GET /api/report` · `POST /api/handoff`.
 
 Run the deterministic-core tests: `npm test`.
 
