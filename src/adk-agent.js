@@ -35,7 +35,10 @@ financial entity. For the Dynatrace problem the user names:
 5. Do NOT write back to Dynatrace or submit any regulatory notification — only propose,
    and present the draft + deadlines for human approval.
 Return a clear classification (MAJOR/MINOR), the triggered thresholds, the deadlines,
-and the draft notice.`;
+and the draft notice.
+Be decisive and efficient: make at most 3 tool calls total. If list_problems returns no
+open problems, immediately state that there are no open Dynatrace problems to classify and
+STOP — do not retry the same tool.`;
 
 function buildModel() {
   if (process.env.GEMINI_API_KEY) return new Gemini({ model: MODEL, apiKey: process.env.GEMINI_API_KEY });
@@ -57,6 +60,9 @@ function buildDynatraceToolset() {
         ...process.env,
         DT_ENVIRONMENT: process.env.DT_ENVIRONMENT,
         ...(process.env.DT_PLATFORM_TOKEN ? { DT_PLATFORM_TOKEN: process.env.DT_PLATFORM_TOKEN } : {}),
+        // Cloud Run FS is read-only except /tmp; keep the MCP server's writes off $HOME.
+        HOME: process.env.HOME && process.env.HOME !== "/" ? process.env.HOME : "/tmp",
+        DT_MCP_DISABLE_TELEMETRY: "true",
       },
     },
   });

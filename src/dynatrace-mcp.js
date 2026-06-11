@@ -35,8 +35,12 @@ async function session() {
       ...process.env,
       DT_ENVIRONMENT: process.env.DT_ENVIRONMENT,
       ...(process.env.DT_PLATFORM_TOKEN ? { DT_PLATFORM_TOKEN: process.env.DT_PLATFORM_TOKEN } : {}),
+      // Cloud Run's FS is read-only except /tmp; the server writes telemetry/cache to
+      // $HOME, so point it at /tmp and disable telemetry or it crashes on startup.
+      HOME: process.env.HOME && process.env.HOME !== "/" ? process.env.HOME : "/tmp",
+      DT_MCP_DISABLE_TELEMETRY: "true",
     },
-    stderr: "ignore",
+    stderr: "inherit",
   });
   const client = new Client({ name: "dynacompliance", version: "2.0.0" }, { capabilities: {} });
   await client.connect(transport);

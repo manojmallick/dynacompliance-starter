@@ -1,5 +1,16 @@
 # DynaCompliance — DORA Art.18/19 Incident Classification & Reporting Agent
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Live on Cloud Run](https://img.shields.io/badge/Live-Cloud%20Run-4285F4?logo=googlecloud&logoColor=white)](https://dynacompliance-908307939543.europe-west1.run.app)
+[![Gemini 3](https://img.shields.io/badge/Gemini%203-flash--preview-8E75B2?logo=googlegemini&logoColor=white)](https://ai.google.dev/)
+[![Agent Builder · ADK](https://img.shields.io/badge/Agent%20Builder-ADK%20(%40google%2Fadk)-34A853?logo=google&logoColor=white)](https://github.com/google/adk-js)
+[![Dynatrace MCP](https://img.shields.io/badge/Dynatrace-MCP-1496FF?logo=dynatrace&logoColor=white)](https://github.com/dynatrace-oss/dynatrace-mcp)
+[![Node 24](https://img.shields.io/badge/Node-24-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+
+> ### ▶ Live demo: **https://dynacompliance-908307939543.europe-west1.run.app**
+> Proof the required stack runs at runtime: [`/health`](https://dynacompliance-908307939543.europe-west1.run.app/health) →
+> `gemini_live`, `partner_mcp_connected` (20 Dynatrace tools), `agent_builder`.
+
 Dynatrace detects an ICT incident → the agent collects the data, applies DORA
 **Article 18** major/minor classification criteria, computes the **Article 19** 4h / 72h /
 1-month reporting deadlines from the **detection** timestamp, and drafts the EBA
@@ -10,16 +21,23 @@ to Dynatrace and submits to the regulator. ~90 seconds vs ~47 minutes manual.
 > (the major/minor thresholds) · **Art.19** reporting (early-warning / intermediate /
 > final) · **Art.28** ICT third-party risk.
 
-**Stack (Google Cloud Rapid Agent Hackathon — Dynatrace bucket):**
-- 🧠 **Gemini 3** — classification rationale + EBA drafting *(required)*
-- 🏗️ **Google Cloud Agent Builder** — agent orchestration *(required)*
-- 📊 **Dynatrace via Dynatrace MCP** — partner superpower *(required)*
-- ☁️ Cloud Run (hosting)
+**Stack (Google Cloud Rapid Agent Hackathon — Dynatrace track):**
+- 🧠 **Gemini 3** (`gemini-3-flash-preview`) — classification rationale + EBA drafting
+- 🏗️ **Google Cloud Agent Builder / ADK** (`@google/adk`) — the agent loop at `POST /api/classify-agent`
+- 📊 **Dynatrace MCP** (`@dynatrace-oss/dynatrace-mcp-server`) — live incident data, **called at runtime**
+- ☁️ **Cloud Run** + **Node 24** — hosting
 
-> Working scaffold, not a finished product. Sibling of `../regquery-starter/` and
-> `../codeguard-starter/` — same agent loop, approval gate, `/health` proof. Dynatrace
-> MCP swapped in, accent cyan. **`[TESTED: NO]`** vs live Dynatrace/Vertex — run it and
-> map your environment's metrics in `src/dynatrace.js → toIncident()` before recording.
+> **All three required technologies execute on the live URL.** The judged agent
+> (`POST /api/classify-agent`, [`src/adk-agent.js`](src/adk-agent.js)) runs ADK + Gemini 3 +
+> the Dynatrace MCP server in **one agent loop** and returns `mcp_tools_called` as proof the
+> partner MCP server actually ran. The dashboard runs on badged demo incidents for a vivid
+> walkthrough; the Gemini drafting, the MCP connection, and the ADK agent are genuinely live.
+
+## Screenshots
+
+| Operations Center | Incident Deep Dive | Monthly DORA Report |
+|---|---|---|
+| ![Operations Center dashboard](docs/screenshots/dashboard.png) | ![Incident deep dive with approval gate](docs/screenshots/deep-dive.png) | ![Monthly DORA compliance report](docs/screenshots/report.png) |
 
 ## Architecture
 ```
