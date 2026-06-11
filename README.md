@@ -41,7 +41,7 @@ to Dynatrace and submits to the regulator. ~90 seconds vs ~47 minutes manual.
 
 **Docs:** [ARCHITECTURE.md](ARCHITECTURE.md) (system + agent-loop diagrams) ·
 [DEVPOST.md](DEVPOST.md) (submission write-up) · [DECK.md](DECK.md) (pitch) ·
-[DEMO.md](DEMO.md) (3-min demo script)
+[DEMO.md](DEMO.md) (3-min demo script) · [DEMO_VIDEO_PLAN.md](DEMO_VIDEO_PLAN.md) (video storyboard)
 
 ![Architecture](docs/screenshots/architecture.png)
 
