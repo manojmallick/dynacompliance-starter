@@ -40,7 +40,7 @@ to Dynatrace and submits to the regulator. ~90 seconds vs ~47 minutes manual.
 | ![Operations Center dashboard](docs/screenshots/dashboard.png) | ![Incident deep dive with approval gate](docs/screenshots/deep-dive.png) | ![Monthly DORA compliance report](docs/screenshots/report.png) |
 
 **Docs:** [ARCHITECTURE.md](ARCHITECTURE.md) (system + agent-loop diagrams) ·
-[DEVPOST.md](DEVPOST.md) (submission write-up) · [DECK.md](DECK.md) (pitch) ·
+[DEVPOST.md](DEVPOST.md) (submission write-up) · [DECK.md](DECK.md) / [DECK.pdf](DECK.pdf) (pitch) ·
 [DEMO.md](DEMO.md) (3-min demo script) · [DEMO_VIDEO_PLAN.md](DEMO_VIDEO_PLAN.md) (video storyboard)
 
 ![Architecture](docs/screenshots/architecture.png)
