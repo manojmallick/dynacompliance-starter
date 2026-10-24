@@ -154,6 +154,20 @@ gcloud run deploy dynacompliance \
 `--set-env-vars=GOOGLE_GENAI_USE_VERTEXAI=true,GOOGLE_CLOUD_PROJECT=...` — Cloud Run's
 service account provides ADC natively.)
 
+### More environment variables and scripts
+
+Also read from the environment: `GOOGLE_CLOUD_LOCATION` (Vertex AI region) and `NODE_ENV`.
+
+#### Scripts
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Server with `--watch` (loads `.env` if present) |
+| `npm start` | Server |
+| `npm run demo` | Demo mode: `MOCK=true` on port `8090`, no credentials |
+| `npm test` | Unit tests (`node --test`) |
+| `npm run inspect:dt` | Inspect the Dynatrace data (`scripts/inspect-dynatrace.js`) |
+
 ### Connect real Dynatrace data
 `src/dynatrace.js → toIncident()` currently reads placeholder metric fields. Discover the
 real field names against your environment, then map them:
